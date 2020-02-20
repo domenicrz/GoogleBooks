@@ -12,9 +12,8 @@ namespace GoogleBooks
         static void Main(string[] args)
         {
             string initialPath = @"input/";
-            string outputPath = @"input/";
+            string outputPath = @"output/";
             string testFile = "a_example.txt";
-            string resultFile = ".txt";
 
             StreamReader inputStream = new StreamReader(new FileStream(string.Format("{0}{1}", initialPath, testFile), FileMode.Open));
             string[] firstLine = inputStream.ReadLine().Split(' ');
@@ -27,7 +26,7 @@ namespace GoogleBooks
             {
                 string[] libraryData = inputStream.ReadLine().Split(' ');
                 string[] booksIndexes = inputStream.ReadLine().Split(' ');
-                libraries.Add(new Library(libraryData[0], libraryData[1], libraryData[2],booksIndexes));
+                libraries.Add(new Library(libraryData[0], libraryData[1], libraryData[2],booksIndexes, i));
             }
             inputStream.Close();
 
@@ -39,15 +38,20 @@ namespace GoogleBooks
                 int bestLibraryIndex = BestLibrary(libraries, booksScores, dayForScanning, remainingBooks);
                 finalLibraries.Add(libraries[bestLibraryIndex]);
                 dayForScanning -= libraries[bestLibraryIndex].daysForSignupProcess;
-                remainingBooks = remainingBooks.Except(libraries[bestLibraryIndex].ordereBooksIDs).ToList();
+                remainingBooks = remainingBooks.Except(libraries[bestLibraryIndex].orderedBooksIDs).ToList();
 
                 libraries.RemoveAt(bestLibraryIndex);
             }
 
-
-            using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, resultFile), FileMode.Create)))
+            Directory.CreateDirectory(outputPath);
+            using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, testFile), FileMode.Create)))
             {
-
+                outputFile.WriteLine(finalLibraries.Count);
+                foreach(Library library in finalLibraries)
+                {
+                    outputFile.WriteLine(string.Format("{0} {1}", library.id, library.orderedBooksIDs.Count));
+                    outputFile.WriteLine(string.Join(" ", library.orderedBooksIDs));
+                }
             }
         }
 
@@ -62,16 +66,19 @@ namespace GoogleBooks
 
         }
 
-        private class Library
+        public class Library
         {
+            public int id;
             public int bookCount;
             public int daysForSignupProcess;
             public int shippingForDays;
             public List<int> booksIDs = new List<int>();
-            public List<int> ordereBooksIDs = new List<int>();
+            public List<int> orderedBooksIDs = new List<int>();
 
-            public Library(string bC, string suT, string ms,string[] booksIndexes)
+            public Library(string bC, string suT, string ms,string[] booksIndexes, int index)
             {
+
+                id = index;
                 bookCount = int.Parse(bC);
                 daysForSignupProcess = int.Parse(suT);
                 shippingForDays = int.Parse(ms);
@@ -91,7 +98,7 @@ namespace GoogleBooks
                 capacity = capacity > intersectionBooksIDs.Count() ? intersectionBooksIDs.Count : capacity;
 
                 var score = intersectionBooksScoresOrdered.Take(capacity).Sum();
-                this.ordereBooksIDs = intersectionBooksIDs.OrderByDescending(i => booksScores[i]).Take(capacity).ToList();
+                this.orderedBooksIDs = intersectionBooksIDs.OrderByDescending(i => booksScores[i]).Take(capacity).ToList();
 
                 return score;
             }
