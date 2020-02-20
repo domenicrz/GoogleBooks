@@ -12,9 +12,8 @@ namespace GoogleBooks
         static void Main(string[] args)
         {
             string initialPath = @"input/";
-            string outputPath = @"input/";
-            string testFile = "f_libraries_of_the_world.txt";
-            string resultFile = ".txt";
+            string outputPath = @"output/";
+            string testFile = "a_example.txt";
 
             StreamReader inputStream = new StreamReader(new FileStream(string.Format("{0}{1}", initialPath, testFile), FileMode.Open));
             string[] firstLine = inputStream.ReadLine().Split(' ');
@@ -27,7 +26,7 @@ namespace GoogleBooks
             {
                 string[] libraryData = inputStream.ReadLine().Split(' ');
                 string[] booksIndexes = inputStream.ReadLine().Split(' ');
-                libraries.Add(new Library(libraryData[0], libraryData[1], libraryData[2],booksIndexes));
+                libraries.Add(new Library(libraryData[0], libraryData[1], libraryData[2],booksIndexes, i));
             }
             inputStream.Close();
 
@@ -36,22 +35,32 @@ namespace GoogleBooks
                 Console.WriteLine(item.Score(booksScores.Select(i => int.Parse(i)).ToList(), deadline, Enumerable.Range(0, booksScores.Count() -1).ToList()));
             }
 
-
-            using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, resultFile), FileMode.Create)))
+            List<Library> finalLibraries = new List<Library>();
+            Directory.CreateDirectory(outputPath);
+            using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, testFile), FileMode.Create)))
             {
-
+                outputFile.WriteLine(finalLibraries.Count);
+                foreach(Library library in finalLibraries)
+                {
+                    outputFile.WriteLine(string.Format("{0} {1}", library.id, library.orderedBooksIDs.Count));
+                    outputFile.WriteLine(string.Join(" ", library.orderedBooksIDs));
+                }
             }
         }
 
-        private class Library
+        public class Library
         {
-            int bookCount;
-            int daysForSignupProcess;
-            int shippingForDays;
-            List<int> booksIDs = new List<int>();
+            public int id;
+            public int bookCount;
+            public int daysForSignupProcess;
+            public int shippingForDays;
+            public List<int> booksIDs = new List<int>();
+            public List<int> orderedBooksIDs = new List<int>();
 
-            public Library(string bC, string suT, string ms,string[] booksIndexes)
+            public Library(string bC, string suT, string ms,string[] booksIndexes, int index)
             {
+
+                id = index;
                 bookCount = int.Parse(bC);
                 daysForSignupProcess = int.Parse(suT);
                 shippingForDays = int.Parse(ms);
