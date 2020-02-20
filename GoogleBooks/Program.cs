@@ -41,20 +41,33 @@ namespace GoogleBooks
         private class Library
         {
             int bookCount;
-            int singUpTime;
-            int maxSend;
-            List<int> booksId = new List<int>();
-            double libScore = 0;
+            int daysForSignupProcess;
+            int shippingForDays;
+            List<int> booksIDs = new List<int>();
 
             public Library(string bC, string suT, string ms,string[] booksIndexes)
             {
                 bookCount = int.Parse(bC);
-                singUpTime = int.Parse(suT);
-                maxSend = int.Parse(ms);
+                daysForSignupProcess = int.Parse(suT);
+                shippingForDays = int.Parse(ms);
                 foreach (string id in booksIndexes)
                 {
-                    booksId.Add(int.Parse(id));
+                    booksIDs.Add(int.Parse(id));
                 }
+            }
+
+            public long Score(List<int> booksScores, int dayForScanning, List<int> remainingBooks)
+            {
+
+                List<int> intersectionBooksIDs = remainingBooks.Intersect(booksIDs).ToList();
+                List<int> intersectionBooksScoresOrdered = intersectionBooksIDs.Select(index => booksScores[index]).OrderByDescending(item => item).ToList();
+
+                var capacity = (dayForScanning - daysForSignupProcess) * shippingForDays;
+                capacity = capacity > intersectionBooksIDs.Count() ? intersectionBooksIDs.Count : capacity;
+
+                var score = intersectionBooksScoresOrdered.Take(capacity).Sum();
+
+                return score;
             }
         }
 
