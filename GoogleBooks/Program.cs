@@ -20,8 +20,8 @@ namespace GoogleBooks
             string[] firstLine = inputStream.ReadLine().Split(' ');
             int booksTypes = int.Parse(firstLine[0]);
             int librariesNumber = int.Parse(firstLine[1]);
-            int deadline = int.Parse(firstLine[2]);
-            string[] booksScores = inputStream.ReadLine().Split(' ');
+            int dayForScanning = int.Parse(firstLine[2]);
+            List<int> booksScores = inputStream.ReadLine().Split(' ').Select(i => int.Parse(i)).ToList();
             List<Library> libraries = new List<Library>();
             for (int i = 0; i<librariesNumber; i++)
             {
@@ -31,9 +31,17 @@ namespace GoogleBooks
             }
             inputStream.Close();
 
-            foreach (var item in libraries)
+            List<Library> finalLibraries = new List<Library>();
+            List<int> remainingBooks = Enumerable.Range(0, booksScores.Count()).ToList();
+
+            while (dayForScanning > 0)
             {
-                Console.WriteLine(item.Score(booksScores.Select(i => int.Parse(i)).ToList(), deadline, Enumerable.Range(0, booksScores.Count() -1).ToList()));
+                int bestLibraryIndex = BestLibrary(libraries, booksScores, dayForScanning, remainingBooks);
+                finalLibraries.Add(libraries[bestLibraryIndex]);
+                dayForScanning -= libraries[bestLibraryIndex].daysForSignupProcess;
+                remainingBooks = remainingBooks.Except(libraries[bestLibraryIndex].ordereBooksIDs).ToList();
+
+                libraries.RemoveAt(bestLibraryIndex);
             }
 
 
@@ -43,12 +51,24 @@ namespace GoogleBooks
             }
         }
 
+        private static int BestLibrary(List<Library> remaningLibraries, List<int> booksScores, int dayForScanning, List<int> remainingBooks)
+        {
+            List<int> librariesScores = new List<int>();
+            foreach (var library in remaningLibraries)
+            {
+                librariesScores.Add(library.Score(booksScores, dayForScanning, remainingBooks));
+            }
+            return librariesScores.IndexOf(librariesScores.Max());
+
+        }
+
         private class Library
         {
-            int bookCount;
-            int daysForSignupProcess;
-            int shippingForDays;
-            List<int> booksIDs = new List<int>();
+            public int bookCount;
+            public int daysForSignupProcess;
+            public int shippingForDays;
+            public List<int> booksIDs = new List<int>();
+            public List<int> ordereBooksIDs = new List<int>();
 
             public Library(string bC, string suT, string ms,string[] booksIndexes)
             {
@@ -61,7 +81,7 @@ namespace GoogleBooks
                 }
             }
 
-            public long Score(List<int> booksScores, int dayForScanning, List<int> remainingBooks)
+            public int Score(List<int> booksScores, int dayForScanning, List<int> remainingBooks)
             {
 
                 List<int> intersectionBooksIDs = remainingBooks.Intersect(booksIDs).ToList();
@@ -71,6 +91,7 @@ namespace GoogleBooks
                 capacity = capacity > intersectionBooksIDs.Count() ? intersectionBooksIDs.Count : capacity;
 
                 var score = intersectionBooksScoresOrdered.Take(capacity).Sum();
+                this.ordereBooksIDs = intersectionBooksIDs.OrderByDescending(i => booksScores[i]).Take(capacity).ToList();
 
                 return score;
             }
