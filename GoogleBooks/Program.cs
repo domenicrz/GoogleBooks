@@ -13,7 +13,7 @@ namespace GoogleBooks
         {
             string initialPath = @"input/";
             string outputPath = @"input/";
-            string testFile = "f_libraries_of_the_world.txt";
+            string testFile = "a_example.txt";
             string resultFile = ".txt";
 
             StreamReader inputStream = new StreamReader(new FileStream(string.Format("{0}{1}", initialPath, testFile), FileMode.Open));
@@ -34,7 +34,7 @@ namespace GoogleBooks
             List<Library> finalLibraries = new List<Library>();
             List<int> remainingBooks = Enumerable.Range(0, booksScores.Count()).ToList();
 
-            while (dayForScanning > 0)
+            while (dayForScanning > 0 && libraries.Count() > 0 && remainingBooks.Count() > 0)
             {
                 int bestLibraryIndex = BestLibrary(libraries, booksScores, dayForScanning, remainingBooks);
                 finalLibraries.Add(libraries[bestLibraryIndex]);
