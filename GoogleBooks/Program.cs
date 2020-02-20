@@ -43,7 +43,6 @@ namespace GoogleBooks
                 libraries.RemoveAt(bestLibraryIndex);
             }
 
-            List<Library> finalLibraries = new List<Library>();
             Directory.CreateDirectory(outputPath);
             using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, testFile), FileMode.Create)))
             {
