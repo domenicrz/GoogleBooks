@@ -54,6 +54,9 @@
     <Content Include="input\a_example.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="input\a_example_trace.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="input\b_read_on.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

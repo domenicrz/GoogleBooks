@@ -13,7 +13,7 @@ namespace GoogleBooks
         {
             string initialPath = @"input/";
             string outputPath = @"output/";
-            string testFile = "a_example.txt";
+            string testFile = "a_example_trace.txt";
 
             StreamReader inputStream = new StreamReader(new FileStream(string.Format("{0}{1}", initialPath, testFile), FileMode.Open));
             string[] firstLine = inputStream.ReadLine().Split(' ');
