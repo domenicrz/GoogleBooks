@@ -11,8 +11,8 @@ namespace GoogleBooks
     {
         static void Main(string[] args)
         {
-            string initialPath = @"D:\Users\domen\source\repos\GoogleBooks\GoogleBooks\input\";
-            string outputPath = @"D:\Users\domen\source\repos\GoogleBooks\GoogleBooks\output\";
+            string initialPath = @"input/";
+            string outputPath = @"input/";
             string testFile = "f_libraries_of_the_world.txt";
             string resultFile = ".txt";
 
@@ -30,7 +30,12 @@ namespace GoogleBooks
                 libraries.Add(new Library(libraryData[0], libraryData[1], libraryData[2],booksIndexes));
             }
             inputStream.Close();
-            
+
+            foreach (var item in libraries)
+            {
+                Console.WriteLine(item.Score(booksScores.Select(i => int.Parse(i)).ToList(), deadline, Enumerable.Range(0, booksScores.Count() -1).ToList()));
+            }
+
 
             using (StreamWriter outputFile = new StreamWriter(new FileStream(string.Format("{0}{1}", outputPath, resultFile), FileMode.Create)))
             {
